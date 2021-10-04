@@ -7,40 +7,40 @@ public class MainFork {
         long m = System.currentTimeMillis();
         int nThreads = Runtime.getRuntime().availableProcessors();
         //размер массива
-        int SIZE=100000;
-        int[] arr=new int[SIZE];
+        int SIZE = 100000;
+        int[] arr = new int[SIZE];
         randomArr(arr);
         ForkJoinPool forkJoinPool = new ForkJoinPool(nThreads);
-        Integer result = forkJoinPool.invoke(new Sum(arr,0,arr.length));
-
+        Integer result = forkJoinPool.invoke(new Sum(arr, 0, arr.length));
         System.out.println("Результат:" + result);
-        System.out.println("Продолжительность (мс)" + (double) (System.currentTimeMillis()-m));
+        System.out.println("Продолжительность (мс)" + (double) (System.currentTimeMillis() - m));
     }
-    static class Sum extends RecursiveTask<Integer>{
+
+    static class Sum extends RecursiveTask<Integer> {
         int low;
         int high;
         int[] array;
 
         Sum(int[] array, int low, int high) {
             this.array = array;
-            this.low   = low;
-            this.high  = high;
+            this.low = low;
+            this.high = high;
         }
+
         @Override
         protected Integer compute() {
-            if(high - low <= 10) {
+            if (high - low <= 10) {
                 int sum = 0;
-
-                for(int i = low; i < high; ++i)
+                for (int i = low; i < high; ++i)
                     sum += array[i];
                 return sum;
             } else {
                 int mid = low + (high - low) / 2;
-                Sum left  = new Sum(array, low, mid);
+                Sum left = new Sum(array, low, mid);
                 Sum right = new Sum(array, mid, high);
                 left.fork();
                 int rightResult = right.compute();
-                int leftResult  = left.join();
+                int leftResult = left.join();
                 return leftResult + rightResult;
             }
         }
